@@ -1,4 +1,5 @@
 import datetime as dt
+import itertools
 import json
 import random
 import string
@@ -21,7 +22,7 @@ def generate_puzzle() -> list:
                     if word[seed_placement] == seed_letter.lower():
                         valid_count += 1
                     if valid_count > 4:
-                        puzzle_state.append((seed_placement, seed_letter))
+                        puzzle_state.append([seed_placement, seed_letter])
                         break
                 else:
                     # puzzle generation failed to find 5 valid words for the first row
@@ -34,9 +35,28 @@ def generate_puzzle() -> list:
             puzzle_state.append((seed_placement, ''))
     return puzzle_state
 
-
 def solve_puzzle(puzzle: list) -> list():
-    pass
+    # alphabetical brute force solver
+    words = []
+    banned_letters = []
+    for i in range(len(puzzle)):
+        for word in guess_words:
+            if word[puzzle[i][0]] == puzzle[i][1].lower() and len([x for x in list(word) if x in banned_letters]) == 0:
+                words.append(word)
+                banned_letters.append(puzzle[i][1].lower())
+                try:
+                    puzzle[i+1][1] = word[puzzle[i+1][0]].upper()
+                except IndexError:
+                    pass
+                break
+        else:
+            print("I surrender")
+            return words
+    return words
+
+def score_result(result: list) -> int:
+    return len(set(itertools.chain.from_iterable(result)))
+
 
 def jsonify_puzzle_for_john(quantity: int) -> None:
     puzzle_dicts = []
@@ -56,6 +76,13 @@ def jsonify_puzzle_for_john(quantity: int) -> None:
 
 
 if __name__ == '__main__':
-    jsonify_puzzle_for_john(100)
+    # generate 100 puzzles
+    # jsonify_puzzle_for_john(100)
+
+    # alphabetical brute force solve and score a puzzle input
+    vals = solve_puzzle([[3, "X"], [0, ""], [1, ""], [2, ""], [0, ""], [2, ""]])
+    print(f"Your score is {score_result(vals)}")
+    for val in vals:
+        print(val)
 
 
