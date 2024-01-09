@@ -1,6 +1,10 @@
+import datetime as dt
+import json
 import random
 import string
 
+# globals
+DATETIME_FORMAT = "%Y-%m-%d"
 
 with open('guesswords.txt', 'r') as guesswords:
     guess_words = [line.rstrip() for line in guesswords]
@@ -30,8 +34,28 @@ def generate_puzzle() -> list:
             puzzle_state.append((seed_placement, ''))
     return puzzle_state
 
-if __name__ == "__main__":
-  for _ in range(100):
-      print(generate_puzzle())
+
+def solve_puzzle(puzzle: list) -> list():
+    pass
+
+def jsonify_puzzle_for_john(quantity: int) -> None:
+    puzzle_dicts = []
+    now = dt.datetime.now()
+    delta = dt.timedelta(days=1)
+    for _ in range(quantity):
+        puzzle_vals = {}
+        puzzle = generate_puzzle()
+        puzzle_vals['date'] = now.strftime(DATETIME_FORMAT)
+        puzzle_vals['puzzle'] = puzzle
+        puzzle_dicts.append(puzzle_vals)
+        now += delta
+    json_puzzle_dicts = {'puzzles' : puzzle_dicts}
+
+    with open('puzzles.json', 'w') as file:
+        json.dump(json_puzzle_dicts, file)
+
+
+if __name__ == '__main__':
+    jsonify_puzzle_for_john(100)
 
 
