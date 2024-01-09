@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAXYPH</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="game.js" type="module"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600&display=swap" rel="stylesheet">
+</head>
+
+<body id="app">
+    <main>
+        <h1>
+            MAXYPH
+        </h1>
+        <p>
+            Try to use all of the letters in the alphabet to make 5 letter words. 
+            You can only get points for the first usage of a letter.
+
+        </p>
+        <div>
+            <div v-for="(word,i) in words">
+                <div class="input">
+                    <input v-model="words[i]" maxlength="5">
+                </div>
+                <div class="word">
+                    <div class="box" :class="getStyleAtPos(i,0)">
+                        {{ getLetterAtPos(i, 0) }}
+                    </div>
+                    <div class="box" :class="getStyleAtPos(i,1)">
+                        {{ getLetterAtPos(i,1) }}
+                    </div>
+                    <div class="box" :class="getStyleAtPos(i,2)">
+                        {{ getLetterAtPos(i,2) }}
+                    </div>
+                    <div class="box" :class="getStyleAtPos(i,3)">
+                        {{ getLetterAtPos(i,3) }}
+                    </div>
+                    <div class="box" :class="getStyleAtPos(i,4)">
+                        {{ getLetterAtPos(i,4) }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+
+</html>

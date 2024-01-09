@@ -1,0 +1,50 @@
+* {
+  font-size: 24px;
+  font-family: "Comfortaa", sans-serif;
+}
+
+.box {
+  border: 3px solid black;
+  width: 30px;
+  height: 30px;
+  padding: 3px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+h1 {
+  text-align: center;
+  font-size: 72px;
+  margin: 0;
+}
+
+body {
+  max-width: 500px;
+  margin: auto;
+  background-color: rgba(173, 216, 230, 0.6);
+}
+main {
+  max-width: 500px;
+  background-color: rgba(200, 200, 200, 0.75);
+  box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
+  padding: 25px;
+}
+
+.locked {
+  background-color: yellow;
+}
+
+.input {
+  padding-top: 5px;
+  width: 100%;
+}
+.input input {
+  width: 100%;
+}
+.word {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  justify-items: center;
+}
