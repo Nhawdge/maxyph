@@ -20,7 +20,9 @@ def generate_puzzle() -> list:
                         puzzle_state.append((seed_placement, seed_letter))
                         break
                 else:
-                    print("Trying again...")
+                    # puzzle generation failed to find 5 valid words for the first row
+                    # trying again
+                    pass
         else:
             valid_placements = list(range(5))
             valid_placements.remove(puzzle_state[i-1][0])
