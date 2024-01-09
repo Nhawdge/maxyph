@@ -19,7 +19,10 @@ Not it isn't!  It's a goddamned puzzle game!
 **Prototype folder**:
 - the maxyph_proto_gen.py will generate 100 initial puzzle states that are "valid" in a puzzles.json file.
 - validity is determined by if the first row can be solved with at least 5 valid words from the word bank.
-- the intent is to build a "solver" logic as well, but that is significantly less important.
+- the prototype also has a brute force alphabetical order solver
+- the prototype can also score the results
+- next intent is to append this to the json puzzle input states so that we can provide a players score vs a 'bot' score.
+
 
 
 
