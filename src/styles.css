@@ -48,3 +48,12 @@ main {
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   justify-items: center;
 }
+
+.score {
+  text-align: right;
+  font-size: 36px;
+  margin: 0;
+}
+.active {
+  background-color: green;
+}

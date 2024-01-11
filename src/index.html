@@ -13,22 +13,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600&display=swap" rel="stylesheet">
 </head>
 
-<body id="app">
-    <main>
+<body>
+    <main id="app">
         <h1>
             MAXYPH
         </h1>
-        <p>
-            Try to use all of the letters in the alphabet to make 5 letter words. 
-            You can only get points for the first usage of a letter.
+        <details>
+            <summary>How to play</summary>
+            <p>
+                Enter 6 valid 5 letter English words to complete the puzzle. Earn a point for each unique character in
+                your
+                solution.
+            </p>
+            <ul>
 
-        </p>
+                <li>A character in an orange box cannot be changed. The first row value is provided, but further rows
+                    inherit the value from the word above them.</li>
+                <li>Orange-boxed letters from previous rows cannot be reused.</li>
+                <li>A maximum possible (theoretical) score is 25.</li>
+                <li>You can surrender at any time and take the score of your current valid words.</li>
+                <li>Have fun!</li>
+            </ul>
+        </details>
         <div>
+            <div class="score">
+                {{ score}}
+            </div>
             <div v-for="(word,i) in words">
-                <div class="input">
-                    <input v-model="words[i]" maxlength="5">
-                </div>
-                <div class="word">
+                <div class="word" :class="i == typeIndex ? 'active' : ''" >
                     <div class="box" :class="getStyleAtPos(i,0)">
                         {{ getLetterAtPos(i, 0) }}
                     </div>
@@ -47,6 +59,7 @@
                 </div>
             </div>
 
+            {{error}}
         </div>
     </main>
 </body>
