@@ -4,7 +4,7 @@ Not it isn't!  It's a goddamned puzzle game!
 
 ![image](https://github.com/Nhawdge/maxyph/assets/32605887/be723b2a-55e7-44d7-90cb-5dea5972bff3)
 
-# [Play Here](/src/)
+# [Play Here](src/)
 
 **The Rules/Ethos of The Game**
 - six words enter, one score leaves
