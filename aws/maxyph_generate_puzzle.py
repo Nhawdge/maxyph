@@ -56,10 +56,6 @@ def get_puzzle_id(table) -> int:
 def lambda_handler(event, context):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('maxyph_puzzles')
-    # dynamodb = boto3.resource('dynamodb')
-    # table = dynamodb.Table('maxyph_puzzles')
-    # response = table.get_item(Key={'id' : 0 })
-    # response = table.put_item(Item={'id': 0, 'puzzle': [[0, "R"]]})
     id = get_puzzle_id(table)
     puzzle = jsonify_puzzle_for_john()
     response = table.put_item(Item={'partition': 0, 'id': id, 'puzzle': puzzle['puzzle'], 'date' : puzzle['date']})
