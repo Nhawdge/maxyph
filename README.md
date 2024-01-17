@@ -2,7 +2,7 @@ MAXYPH is a competitive turn-based moba war simulator game set in the late 1700s
 
 Not it isn't!  It's a goddamned puzzle game!
 
-![image](https://github.com/Nhawdge/maxyph/assets/32605887/be723b2a-55e7-44d7-90cb-5dea5972bff3)
+![image](https://maxyph.com)
 
 # [Play Here](src/)
 
