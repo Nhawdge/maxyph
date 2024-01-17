@@ -26,4 +26,5 @@ Not it isn't!  It's a goddamned puzzle game!
 
 
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X8X4TGANN)
 
