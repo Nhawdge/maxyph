@@ -35,26 +35,31 @@
                 <li>Have fun!</li>
             </ul>
         </details>
-        <div>
-            <div class="score">
-                {{ score}}
-            </div>
-            <div v-for="(word,i) in words">
-                <div class="word" :class="i == typeIndex ? 'active' : ''" >
+        <div class="score-bar">
+            <span>
+                <button @click="quit">Quit</button>
+            </span>
+            <span class="score">
+                Score: {{ score }}
+            </span>
+        </div>
+        <div class="puzzle">
+            <div v-for="(word,i) in words" class="row">
+                <div class="word" :class="i == typeIndex ? 'active' : ''">
                     <div class="box" :class="getStyleAtPos(i,0)">
-                        {{ getLetterAtPos(i, 0) }}
+                        <div>{{ getLetterAtPos(i, 0) }}</div>
                     </div>
                     <div class="box" :class="getStyleAtPos(i,1)">
-                        {{ getLetterAtPos(i,1) }}
+                        <div>{{ getLetterAtPos(i,1) }}</div>
                     </div>
                     <div class="box" :class="getStyleAtPos(i,2)">
-                        {{ getLetterAtPos(i,2) }}
+                        <div>{{ getLetterAtPos(i,2) }}</div>
                     </div>
                     <div class="box" :class="getStyleAtPos(i,3)">
-                        {{ getLetterAtPos(i,3) }}
+                        <div>{{ getLetterAtPos(i,3) }}</div>
                     </div>
                     <div class="box" :class="getStyleAtPos(i,4)">
-                        {{ getLetterAtPos(i,4) }}
+                        <div>{{ getLetterAtPos(i,4) }}</div>
                     </div>
                 </div>
             </div>

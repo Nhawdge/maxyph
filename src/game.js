@@ -37,6 +37,7 @@ var app = createApp({
       }
       return isvalid;
     },
+    quit() {},
   },
   computed: {
     score() {
@@ -53,21 +54,24 @@ var app = createApp({
       });
     document.addEventListener("keydown", (e) => {
       if (e.key == "Backspace") {
-        this.words[this.typeIndex] = this.words[this.typeIndex].substring(0, this.words[this.typeIndex].length - 1);
         if (this.words[this.typeIndex].length == 0) {
           this.typeIndex = Math.max(0, Math.min(5, this.typeIndex - 1));
         }
+        this.words[this.typeIndex] = this.words[this.typeIndex].substring(0, this.words[this.typeIndex].length - 1);
       } else if (e.key == "Enter") {
+        console.log(this.words[this.typeIndex].length, this.words[this.typeIndex], this.wordIsValid(this.words[this.typeIndex]));
         if (this.words[this.typeIndex].length == 5 && this.wordIsValid(this.words[this.typeIndex])) {
           this.typeIndex = Math.max(0, Math.min(5, this.typeIndex + 1));
         }
-      } else if (e.key.length == 1 && this.words[this.typeIndex].length < 5) {
+      }
+
+      if (e.key.length == 1 && this.words[this.typeIndex].length < 5) {
+        this.words[this.typeIndex] += e.key;
         var required = this.getLetterAtPos(this.typeIndex, this.words[this.typeIndex].length);
         console.log(required, e.key);
         if (required) {
           this.words[this.typeIndex] += required;
         }
-        this.words[this.typeIndex] += e.key;
       }
     });
   },
