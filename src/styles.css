@@ -28,8 +28,7 @@ main {
   padding: 25px;
 }
 
-.puzzle{
-
+.puzzle {
 }
 
 .locked {
@@ -48,15 +47,16 @@ main {
   margin: 0;
 }
 
-.active {
-  background-color: var(--color-four);
+.active .box {
+  border-color: var(--color-one);
 }
 
 .word {
   display: flex;
+  margin: -8px;
 }
 
-.row{
+.row {
   display: flex;
   align-content: center;
   justify-content: center;
@@ -67,13 +67,14 @@ main {
 }
 
 .row:nth-child(odd) {
-  transform: translate(10px);
+  transform: translate(15px);
 }
 
 .box {
   border: 5px solid black;
   width: 30px;
-  height: 30px;  
+  height: 30px;
+  margin: 5px;
   text-align: center;
   transform: rotate(45deg);
 }
