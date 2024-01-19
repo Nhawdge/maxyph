@@ -14,7 +14,8 @@ Components used:
 - lambda_function.py
 
 This is a function called via AWS API Gateway unauthenticated to retrieve the puzzle input for the day.
-https://u2qy92og0i.execute-api.us-west-2.amazonaws.com/puzzle
+
+URL to call:  https://u2qy92og0i.execute-api.us-west-2.amazonaws.com/puzzle
 
 Components used:
 - AWS API Gateway
