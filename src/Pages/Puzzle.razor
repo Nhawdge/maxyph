@@ -48,7 +48,7 @@
             </div>
         }
         <div>
-            @ErrorMessage
+            @StatusMessage
         </div>
     </div>
     <div class="keyboard">
@@ -70,14 +70,15 @@
 
     private List<Word> words = new() { new Word(), new Word(), new Word(), new Word(), new Word(), new Word(), };
     private Word PuzzleStart = new();
-    private List<string> validWords = new();
+    private List<string> ValidWords = new();
+    private List<string> InvalidWords = new();
     private int WordIndex = 0;
     private int LetterIndex = 0;
 
     private char Backspace = '←';
     private char Enter = '◄';
 
-    private string ErrorMessage = string.Empty;
+    private string StatusMessage = string.Empty;
     private int Score = 0;
     private List<List<Char>> Keyboard = new() {
         { new () { 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'} },
@@ -90,8 +91,8 @@
         LoadTodaysPuzzle();
 
         //await MainTag.FocusAsync();
-        var wordstxt = await Http.GetStringAsync("/Data/Words.txt");
-        validWords = wordstxt.Split('\n').Select(x => x.Trim()).ToList();
+        var wordstxt = await Http.GetStringAsync("Data/Words.txt");
+        ValidWords = wordstxt.Split('\n').Select(x => x.Trim()).ToList();
 
         StateHasChanged();
 
@@ -116,14 +117,20 @@
 
     protected bool IsWordValid(Word word)
     {
-        ErrorMessage = "";
-        if (validWords.Contains(word.ToString().ToLowerInvariant()))
+        var lockedWords = words.Take(WordIndex).Select(x => x.ToString());
+        StatusMessage = "";
+        if (lockedWords.Contains(word.ToString()))
+        {
+            StatusMessage = "You cannot use a word from a previous row";
+            return false;
+        }
+        if (ValidWords.Contains(word.ToString().ToLowerInvariant()))
         {
             return true;
         }
         else
         {
-            ErrorMessage = "Not a valid word";
+            StatusMessage = "Not a valid word";
             return false;
         }
     }
@@ -170,7 +177,7 @@
 
                 if (WordIndex >= 6)
                 {
-                    ErrorMessage = "You have completed the puzzle!";
+                    StatusMessage = "You have completed the puzzle!";
                     StateHasChanged();
                     return;
                 }
