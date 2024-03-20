@@ -23,3 +23,6 @@ jobs:
       uses: actions/upload-pages-artifact@v3.0.1
       with:
         path: src/bin/Release/net8.0/publish/wwwroot # default is _site/
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
