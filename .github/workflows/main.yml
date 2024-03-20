@@ -19,3 +19,12 @@ jobs:
       run: dotnet restore src/
     - name: Publish 
       run: dotnet publish src/ --configuration Release
+    - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3.0.1
+          with:
+            # Artifact name
+            name: # optional, default is github-pages
+            # Path of the directory containing the static assets.
+            path: src/bin/Release/net8.0/wwwroot # default is _site/
+            # Duration after which artifact will expire in days.
+            retention-days: # optional, default is 1
