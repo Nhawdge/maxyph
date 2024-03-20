@@ -1,0 +1,216 @@
+﻿@page "/"
+@page "/puzzle"
+
+@using Maxyph.Logic
+@using static System.Net.WebRequestMethods
+
+@inject HttpClient Http
+
+<main @onkeypress="ProcessKeyPress" @ref="MainTag">
+    <h1>
+        MAXYPH
+    </h1>
+    <details>
+        <summary>How to play</summary>
+        <p>
+            Enter 6 valid 5 letter English words to complete the puzzle. Earn a point for each unique character in
+            your
+            solution.
+        </p>
+        <ul>
+            <li>A character in an orange box cannot be changed. The first row value is provided, but further rows inherit the value from the word above them.</li>
+            <li>Orange-boxed letters from previous rows cannot be reused.</li>
+            <li>A maximum possible (theoretical) score is 25.</li>
+            <li>You can surrender at any time and take the score of your current valid words.</li>
+            <li>Have fun!</li>
+        </ul>
+    </details>
+    <div class="score-bar">
+        <span>
+            <button @click="quit">Quit</button>
+        </span>
+        <span class="score">
+            Score: @Score
+        </span>
+    </div>
+    <div class="puzzle">
+        @foreach (var (row, wIndex) in words.Select((x, i) => (x, i)))
+        {
+            <div class="row ">
+                <div class="word">
+                    @foreach (var (letter, lIndex) in row.Letters.Select((x, i) => (x, i)))
+                    {
+                        <div class="box @(letter.Locked ? "locked":"") @((WordIndex == wIndex && lIndex == LetterIndex) ?  "here":"" )">
+                            <div>@letter.Value</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        <div>
+            @ErrorMessage
+        </div>
+    </div>
+    <div class="keyboard">
+        @foreach (var letterRow in Keyboard)
+        {
+            <div class="key-row">
+                @foreach (var letter in letterRow)
+                {
+                    <button class="key" @onclick="() => ProcessKeyClick(letter.ToString())">@letter</button>
+                }
+            </div>
+        }
+    </div>
+</main>
+
+@code {
+
+    private ElementReference MainTag;
+
+    private List<Word> words = new() { new Word(), new Word(), new Word(), new Word(), new Word(), new Word(), };
+    private Word PuzzleStart = new();
+    private List<string> validWords = new();
+    private int WordIndex = 0;
+    private int LetterIndex = 0;
+
+    private char Backspace = '←';
+    private char Enter = '◄';
+
+    private string ErrorMessage = string.Empty;
+    private int Score = 0;
+    private List<List<Char>> Keyboard = new() {
+        { new () { 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'} },
+        { new () {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', '←'} },
+        { new () {'◄', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ' ', ' '} },
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        LoadTodaysPuzzle();
+
+        //await MainTag.FocusAsync();
+        var wordstxt = await Http.GetStringAsync("/Data/Words.txt");
+        validWords = wordstxt.Split('\n').Select(x => x.Trim()).ToList();
+
+        StateHasChanged();
+
+        await Task.CompletedTask;
+    }
+
+    protected bool LoadTodaysPuzzle()
+    {
+        //var puzzle = await Http.GetFromJsonAsync<PuzzleData>("https://u2qy92og0i.execute-api.us-west-2.amazonaws.com/puzzle");
+        PuzzleStart = new Word("   a ");
+        PuzzleStart.LockLetter(3);
+        words.Insert(0, PuzzleStart);
+        words = words.Take(6).ToList();
+        words[1].LockLetter(0);
+        words[2].LockLetter(1);
+        words[3].LockLetter(2);
+        words[4].LockLetter(3);
+        words[5].LockLetter(4);
+
+        return true;
+    }
+
+    protected bool IsWordValid(Word word)
+    {
+        ErrorMessage = "";
+        if (validWords.Contains(word.ToString().ToLowerInvariant()))
+        {
+            return true;
+        }
+        else
+        {
+            ErrorMessage = "Not a valid word";
+            return false;
+        }
+    }
+
+    protected void ProcessLetter(char keyHit)
+    {
+        if (keyHit == Backspace)
+        {
+            var currentLetter = words[WordIndex].Letters[LetterIndex];
+            if (currentLetter.Value != ' ')
+            {
+                LetterIndex = Math.Max(0, Math.Min(5, LetterIndex - 1));
+            }
+            else
+            {
+                currentLetter.Value = ' ';
+            }
+            var newLetter = words[WordIndex].Letters[LetterIndex];
+            if (newLetter.Locked)
+            {
+                LetterIndex = Math.Max(0, Math.Min(5, LetterIndex - 1));
+            }
+        }
+        else if (keyHit == Enter)
+        {
+            var word = words[WordIndex];
+            if (IsWordValid(word))
+            {
+                WordIndex++;
+                LetterIndex = 0;
+                Score = CalcScore();
+
+                var newWord = words.ElementAtOrDefault(WordIndex);
+                if (newWord != null)
+                {
+                    var lastWord = words.ElementAtOrDefault(WordIndex - 1);
+                    var lockedIndex = newWord.Letters.FindIndex(x => x.Locked);
+                    var lockedParent = lastWord.Letters.ElementAtOrDefault(lockedIndex);
+                    if (lockedParent != null)
+                    {
+                        newWord.Letters[lockedIndex].Value = lockedParent.Value;
+                    }
+                }
+
+                if (WordIndex >= 6)
+                {
+                    ErrorMessage = "You have completed the puzzle!";
+                    StateHasChanged();
+                    return;
+                }
+            }
+        }
+        else
+        {
+            if (char.IsAsciiLetter(keyHit))
+            {
+                if (LetterIndex <= 5)
+                {
+                    words[WordIndex].Letters[LetterIndex].Value = keyHit;
+                    LetterIndex = Math.Min(LetterIndex + 1, 4);
+                }
+            }
+        }
+
+        var nextLetter = words[WordIndex].Letters[LetterIndex];
+        if (nextLetter.Locked)
+        {
+            LetterIndex = Math.Min(LetterIndex + 1, 4);
+        }
+        StateHasChanged();
+    }
+
+    private void ProcessKeyPress(KeyboardEventArgs e)
+    {
+        ProcessLetter(e.Key.FirstOrDefault());
+    }
+
+    private void ProcessKeyClick(string key)
+    {
+        ProcessLetter(key.FirstOrDefault());
+    }
+
+
+    private int CalcScore()
+    {
+        var letters = words.SelectMany(x => x.Letters.Select(z => z.Value).Where(z => char.IsLetter(z)));
+        var total = new HashSet<char>(letters);
+        return total.Count;
+    }
+}
