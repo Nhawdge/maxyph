@@ -5,8 +5,16 @@ on:
     tags:
       - "v*.*.*"
       
+permissions:
+  contents: read
+  pages: write
+  id-token: write     
+      
 jobs:
   build:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: windows-latest
 
     steps:
