@@ -18,4 +18,4 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Publish 
-      run: dotnet publish --configuration Release
+      run: dotnet publish src/ --configuration Release
