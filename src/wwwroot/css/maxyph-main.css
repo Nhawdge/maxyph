@@ -71,6 +71,15 @@ main {
         transform: translate(15px);
     }
 
+    .row:first-child {
+        transform: translate(-10px);
+    }
+
+    .row:last-child {
+        transform: translate(15px);
+    }
+
+
 .box {
     border: 5px solid black;
     width: 30px;
@@ -83,8 +92,6 @@ main {
     .box div {
         transform: rotate(-45deg);
     }
-
-
 
 .keyboard {
     margin: 25px;
@@ -104,4 +111,17 @@ main {
 
 .here {
     background-color: white;
+}
+
+button.inline {
+    border: none;
+    background: none;
+}
+
+.used {
+    background-color: rgba(64, 64,64, .50);
+}
+
+.locked-letter {
+    background-color: rgba(0, 0,0, .80);
 }

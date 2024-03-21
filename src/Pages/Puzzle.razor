@@ -36,20 +36,36 @@
     <div class="puzzle">
         @foreach (var (row, wIndex) in words.Select((x, i) => (x, i)))
         {
-            <div class="row ">
+            <div class="row">
                 <div class="word">
+                    @if (wIndex == 0)
+                    {
+                        <div class="box">
+                            <div>
+                                <button class="inline" @onclick="() => ProcessKeyClick(Backspace)">@Backspace</button>
+                            </div>
+                        </div>
+                    }
                     @foreach (var (letter, lIndex) in row.Letters.Select((x, i) => (x, i)))
                     {
-                        <div class="box @(letter.Locked ? "locked":"") @((WordIndex == wIndex && lIndex == LetterIndex) ?  "here":"" )">
+                        <div class="box @(letter.Locked ? "locked":"") @((WordIndex == wIndex && lIndex == LetterIndex) ?  "here":"" ) ">
                             <div>@letter.Value</div>
+                        </div>
+                    }
+                    @if (wIndex == 5)
+                    {
+                        <div class="box">
+                            <div>
+                                <button class="inline" @onclick="() => ProcessKeyClick(Enter)">@Enter</button>
+                            </div>
                         </div>
                     }
                 </div>
             </div>
         }
-        <div>
-            @StatusMessage
-        </div>
+    </div>
+    <div>
+        @StatusMessage
     </div>
     <div class="keyboard">
         @foreach (var letterRow in Keyboard)
@@ -57,7 +73,8 @@
             <div class="key-row">
                 @foreach (var letter in letterRow)
                 {
-                    <button class="key" @onclick="() => ProcessKeyClick(letter.ToString())">@letter</button>
+                    <button class="key @(UsedLetters.Contains(letter) ? "used":"") @(LockedLetters.Contains(letter) ? "locked-letter":"") " 
+                        @onclick="() => { if (!LockedLetters.Contains(letter)){ ProcessKeyClick(letter);}}">@letter</button>
                 }
             </div>
         }
@@ -71,19 +88,20 @@
     private List<Word> words = new() { new Word(), new Word(), new Word(), new Word(), new Word(), new Word(), };
     private Word PuzzleStart = new();
     private List<string> ValidWords = new();
-    private List<string> InvalidWords = new();
+    private List<char> UsedLetters = new();
+    private List<char> LockedLetters = new();
     private int WordIndex = 0;
     private int LetterIndex = 0;
 
     private char Backspace = '←';
-    private char Enter = '◄';
+    private char Enter = '→';
 
     private string StatusMessage = string.Empty;
     private int Score = 0;
     private List<List<Char>> Keyboard = new() {
-        { new () { 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'} },
-        { new () {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', '←'} },
-        { new () {'◄', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ' ', ' '} },
+        { new () {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'} },
+        { new () {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ' '} },
+        { new () {' ', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ' ', ' '} },
     };
 
     protected override async Task OnInitializedAsync()
@@ -181,6 +199,8 @@
                     StateHasChanged();
                     return;
                 }
+                UsedLetters = words.Take(WordIndex).SelectMany(x => x.Letters.Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
+                LockedLetters = words.Take(WordIndex).SelectMany(x => x.Letters.Where(y => y.Locked).Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
             }
         }
         else
@@ -208,9 +228,9 @@
         ProcessLetter(e.Key.FirstOrDefault());
     }
 
-    private void ProcessKeyClick(string key)
+    private void ProcessKeyClick(char key)
     {
-        ProcessLetter(key.FirstOrDefault());
+        ProcessLetter(key);
     }
 
 
