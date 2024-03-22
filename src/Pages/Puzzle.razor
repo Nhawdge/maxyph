@@ -73,8 +73,10 @@
             <div class="key-row">
                 @foreach (var letter in letterRow)
                 {
-                    <button class="key @(UsedLetters.Contains(letter) ? "used":"") @(LockedLetters.Contains(letter) ? "locked-letter":"") " 
-                        @onclick="() => { if (!LockedLetters.Contains(letter)){ ProcessKeyClick(letter);}}">@letter</button>
+                    <button class="key @(UsedLetters.Contains(letter) ? "used":"") @(LockedLetters.Contains(letter) ? "locked-letter":"") "
+                            @onclick="() => { if (!LockedLetters.Contains(letter)){ ProcessKeyClick(letter);}}">
+                        @letter
+                    </button>
                 }
             </div>
         }
@@ -85,7 +87,7 @@
 
     private ElementReference MainTag;
 
-    private List<Word> words = new() { new Word(), new Word(), new Word(), new Word(), new Word(), new Word(), };
+    private List<Word> words = new();
     private Word PuzzleStart = new();
     private List<string> ValidWords = new();
     private List<char> UsedLetters = new();
@@ -106,7 +108,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        LoadTodaysPuzzle();
+        await LoadTodaysPuzzle();
 
         //await MainTag.FocusAsync();
         var wordstxt = await Http.GetStringAsync("Data/Words.txt");
@@ -117,18 +119,18 @@
         await Task.CompletedTask;
     }
 
-    protected bool LoadTodaysPuzzle()
+    protected async Task<bool> LoadTodaysPuzzle()
     {
-        //var puzzle = await Http.GetFromJsonAsync<PuzzleData>("https://u2qy92og0i.execute-api.us-west-2.amazonaws.com/puzzle");
-        PuzzleStart = new Word("   a ");
-        PuzzleStart.LockLetter(3);
-        words.Insert(0, PuzzleStart);
-        words = words.Take(6).ToList();
-        words[1].LockLetter(0);
-        words[2].LockLetter(1);
-        words[3].LockLetter(2);
-        words[4].LockLetter(3);
-        words[5].LockLetter(4);
+        var puzzle = await Http.GetFromJsonAsync<PuzzleData>("https://u2qy92og0i.execute-api.us-west-2.amazonaws.com/puzzle");
+        //var puzzle = await Http.GetFromJsonAsync<PuzzleData>("Data/DailyPuzzle.json");
+
+        foreach (var row in puzzle.puzzle.data)
+        {
+            var nextWord = new Word();
+            nextWord.LockLetter(row.lockIndex);
+            nextWord.SetLetterAtPosition(row.lockIndex, row.letter.ToLower().FirstOrDefault());
+            words.Add(nextWord);
+        }
 
         return true;
     }

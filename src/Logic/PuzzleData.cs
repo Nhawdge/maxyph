@@ -1,19 +1,20 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Maxyph
+﻿namespace Maxyph
 {
     public class PuzzleData
     {
-        [JsonPropertyName("puzzle")]
-        public List<List<PuzzleRow>> Puzzle { get; set; }
-
-        [JsonPropertyName("date")]
-        public DateTimeOffset Date { get; set; }
+        public Puzzle puzzle { get; set; }
     }
 
-    public class PuzzleRow
+    public class Puzzle
     {
-        public long? LockedIndex;
-        public string LockedValue;
+        public string date { get; set; }
+        public string id { get; set; }
+        public Datum[] data { get; set; }
+    }
+
+    public class Datum
+    {
+        public string letter { get; set; }
+        public int lockIndex { get; set; }
     }
 }

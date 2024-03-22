@@ -24,6 +24,8 @@
             }
         }
 
+        public List<Letter> Letters = new();
+
         public void LockLetter(int i)
         {
             try
@@ -33,15 +35,13 @@
             catch (Exception) { }
         }
 
-        public List<Letter> Letters = new();
         public string GetLetterAtPosition(int i)
         {
             return Letters[i].Value.ToString();
         }
-
-        public string GetStyleForPos(int i)
+        public void SetLetterAtPosition(int i, char letter)
         {
-            return Letters[i].Locked ? "locked" : string.Empty;
+            Letters[i].Value = letter;
         }
 
         public override string ToString()
