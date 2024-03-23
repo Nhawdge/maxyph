@@ -125,3 +125,8 @@ button.inline {
 .locked-letter {
     background-color: rgba(0, 0,0, .80);
 }
+
+button {
+    webkit-appearance: none;
+    padding:0px;
+}
