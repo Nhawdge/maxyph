@@ -5,13 +5,35 @@
 @using static System.Net.WebRequestMethods
 
 @inject HttpClient Http
+@inject IJSRuntime JS
 
 <main @onkeypress="ProcessKeyPress" @ref="MainTag">
+    <script>
+        function toggleHowToPlay() {
+
+            var modal = document.getElementById("how-to-play")
+            console.log(modal);
+            if (modal.open) {
+                modal.close();
+            }
+            else {
+                modal.showModal();
+            }
+        }
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(function () {
+                console.log("Copied to clipboard!");
+            })
+                .catch(function (error) {
+                    alert(error);
+                });
+        }
+    </script>
     <h1>
         MAXYPH
     </h1>
-    <details>
-        <summary>How to play</summary>
+    <button @onclick='() => JS.InvokeVoidAsync("toggleHowToPlay")'>How to play</button>
+    <dialog id="how-to-play" @onclick='() => JS.InvokeVoidAsync("toggleHowToPlay")'>
         <p>
             Enter 6 valid 5 letter English words to complete the puzzle. Earn a point for each unique character in
             your
@@ -24,15 +46,7 @@
             <li>You can surrender at any time and take the score of your current valid words.</li>
             <li>Have fun!</li>
         </ul>
-    </details>
-    <div class="score-bar">
-        <span>
-            <button @click="quit">Quit</button>
-        </span>
-        <span class="score">
-            Score: @Score
-        </span>
-    </div>
+    </dialog>
     <div class="puzzle">
         @foreach (var (row, wIndex) in words.Select((x, i) => (x, i)))
         {
@@ -42,7 +56,7 @@
                     {
                         <div class="box">
                             <div>
-                                <button class="inline" @onclick="() => ProcessKeyClick(Backspace)">@Backspace</button>
+                                @Score
                             </div>
                         </div>
                     }
@@ -56,7 +70,7 @@
                     {
                         <div class="box">
                             <div>
-                                <button class="inline" @onclick="() => ProcessKeyClick(Enter)">@Enter</button>
+                                <button class="inline end-game" @onclick="() => EndGame()">❌</button>
                             </div>
                         </div>
                     }
@@ -64,9 +78,15 @@
             </div>
         }
     </div>
-    <div>
+    <div class="message">
         @StatusMessage
     </div>
+    @if (PuzzleCompleted)
+    {
+        <div class="message">
+            <button @onclick="() => GetCopyText()">Copy Score to clipboard</button>
+        </div>
+    }
     <div class="keyboard">
         @foreach (var letterRow in Keyboard)
         {
@@ -75,7 +95,20 @@
                 {
                     <button class="key @(UsedLetters.Contains(letter) ? "used":"") @(LockedLetters.Contains(letter) ? "locked-letter":"") "
                             @onclick="() => { if (!LockedLetters.Contains(letter)){ ProcessKeyClick(letter);}}">
-                        @letter
+                        @{
+                            if (letter == Enter)
+                            {
+                                <text>Enter</text>
+                            }
+                            else if (letter == Backspace)
+                            {
+                                <text>🔙</text>
+                            }
+                            else
+                            {
+                                @letter
+                            }
+                        }
                     </button>
                 }
             </div>
@@ -86,6 +119,7 @@
 @code {
 
     private ElementReference MainTag;
+    private ElementReference HowToPlay;
 
     private List<Word> words = new();
     private Word PuzzleStart = new();
@@ -94,6 +128,7 @@
     private List<char> LockedLetters = new();
     private int WordIndex = 0;
     private int LetterIndex = 0;
+    private bool PuzzleCompleted = false;
 
     private char Backspace = '←';
     private char Enter = '→';
@@ -103,8 +138,8 @@
     private List<List<Char>> Keyboard = new() {
         { new () {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'} },
         { new () {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ' '} },
-        { new () {' ', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ' ', ' '} },
-    };
+        { new () { '→', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '←'} },
+        };
 
     protected override async Task OnInitializedAsync()
     {
@@ -131,6 +166,7 @@
             nextWord.SetLetterAtPosition(row.lockIndex, row.letter.ToLower().FirstOrDefault());
             words.Add(nextWord);
         }
+        ProcessLetter(' ');
 
         return true;
     }
@@ -162,11 +198,11 @@
             var currentLetter = words[WordIndex].Letters[LetterIndex];
             if (currentLetter.Value != ' ')
             {
-                LetterIndex = Math.Max(0, Math.Min(5, LetterIndex - 1));
+                currentLetter.Value = ' ';
             }
             else
             {
-                currentLetter.Value = ' ';
+                LetterIndex = Math.Max(0, Math.Min(5, LetterIndex - 1));
             }
             var newLetter = words[WordIndex].Letters[LetterIndex];
             if (newLetter.Locked)
@@ -197,7 +233,9 @@
 
                 if (WordIndex >= 6)
                 {
-                    StatusMessage = "You have completed the puzzle!";
+                    StatusMessage = "You have completed the puzzle! Your score is " + Score;
+                    PuzzleCompleted = true;
+                    GetCopyText();
                     StateHasChanged();
                     return;
                 }
@@ -222,6 +260,7 @@
         {
             LetterIndex = Math.Min(LetterIndex + 1, 4);
         }
+        CalcScore();
         StateHasChanged();
     }
 
@@ -235,6 +274,12 @@
         ProcessLetter(key);
     }
 
+    private void EndGame()
+    {
+        StatusMessage = "You have surrendered. Your score is " + Score;
+        PuzzleCompleted = true;
+        StateHasChanged();
+    }
 
     private int CalcScore()
     {
@@ -242,4 +287,52 @@
         var total = new HashSet<char>(letters);
         return total.Count;
     }
+
+    private void GetCopyText()
+    {
+        // Large Orange Diamond - U+1F536
+        // Large Blue Diamond - U+1F537
+        // Lock (Closed Lock) - U+1F512
+        // Locked with Key - U+1F510
+
+        //var a = Convert.ToInt32("\U0001F536", 16);
+        var OrangeDiamond = "\U0001F536";
+        var BlueDiamond = "\U0001F537";
+        var Locked = "\U0001F512";
+        var LockedWithKey = "\U0001F510";
+
+        var seenLetters = new HashSet<char>() { '\0' };
+
+        var output = words.Select((x, i) =>
+        {
+            var wordRow = x.Letters.Select(z =>
+            {
+                if (z.Locked)
+                {
+                    seenLetters.Add(z.Value);
+                    if (i == 0)
+                    {
+                        return LockedWithKey;
+                    }
+                    else
+                    {
+                        return Locked;
+                    }
+                }
+                if (seenLetters.Contains(z.Value))
+                {
+                    return BlueDiamond;
+                }
+                else
+                {
+                    seenLetters.Add(z.Value);
+                    return OrangeDiamond;
+                }
+            });
+            return string.Join("", wordRow) + "\n";
+        });
+        var scoreCopy = $"Maxyph Puzzle\n{DateTime.Now.ToString("ddd MMM d")}\n{string.Join("", output)}";
+        JS.InvokeVoidAsync("copyText", scoreCopy);
+    }
 }
+

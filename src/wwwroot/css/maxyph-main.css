@@ -2,10 +2,17 @@
     font-size: 24px;
     font-family: "Comfortaa", sans-serif;
     --color-one: #ff6f4b;
-    --color-two: #fd4c55;
+    --color-two: #00A2E8;
     --color-three: #e13661;
     --color-four: #c1246b;
-    --color-five: #a11477;
+    --color-five: #FF7F27;
+    --color-six: #FFC90E;
+    /*New Colors:
+    D52F64 - > 99D9EA
+    FD4C55 -> 00A2E8
+    A11477 -> FF7F27
+    FFFFFF -> FFC90E
+*/
 }
 
 h1 {
@@ -110,7 +117,7 @@ main {
 }
 
 .here {
-    background-color: white;
+    background-color: var(--color-six);
 }
 
 button.inline {
@@ -123,10 +130,22 @@ button.inline {
 }
 
 .locked-letter {
-    background-color: rgba(0, 0,0, .80);
+    background-color: rgba(0, 0, 0, .80);
 }
 
 button {
     -webkit-appearance: none;
-    padding:0px;
+    padding: 0px;
+}
+
+.end-game {
+    color: black;
+}
+
+.message {
+    text-align: center;
+    font-size: 24px;
+    width:300px;
+    margin: auto;
+    padding-top:20px;
 }

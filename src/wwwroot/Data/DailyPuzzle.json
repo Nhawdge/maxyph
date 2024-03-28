@@ -1,0 +1,32 @@
+{
+  "puzzle": {
+    "date": "2015-01-30",
+    "id": "",
+    "data": [
+      {
+        "letter": "g",
+        "lockIndex": 3
+      },
+      {
+        "letter": "",
+        "lockIndex": 3
+      },
+      {
+        "letter": "",
+        "lockIndex": 0
+      },
+      {
+        "letter": "",
+        "lockIndex": 2
+      },
+      {
+        "letter": "",
+        "lockIndex": 4
+      },
+      {
+        "letter": "",
+        "lockIndex": 1
+      }
+    ]
+  }
+}
