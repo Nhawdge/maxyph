@@ -127,6 +127,6 @@ button.inline {
 }
 
 button {
-    webkit-appearance: none;
+    -webkit-appearance: none;
     padding:0px;
 }
