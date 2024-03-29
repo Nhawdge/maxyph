@@ -54,7 +54,7 @@
                 <div class="word">
                     @if (wIndex == 0)
                     {
-                        <div class="box">
+                        <div class="box whiteout">
                             <div>
                                 @Score
                             </div>
@@ -68,7 +68,7 @@
                     }
                     @if (wIndex == 5)
                     {
-                        <div class="box">
+                        <div class="box whiteout">
                             <div>
                                 <button class="inline end-game" @onclick="() => EndGame()">❌</button>
                             </div>
@@ -114,6 +114,9 @@
             </div>
         }
     </div>
+    <a class="kofi-link" href="https://ko-fi.com/maxyph"> Buy us a Ko-fi</a>
+@*     <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+    <script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#29abe0', 'X8X4TGANN'); kofiwidget2.draw();</script> *@
 </main>
 
 @code {
@@ -331,7 +334,7 @@
             });
             return string.Join("", wordRow) + "\n";
         });
-        var scoreCopy = $"Maxyph Puzzle\n{DateTime.Now.ToString("ddd MMM d")}\n{string.Join("", output)}";
+        var scoreCopy = $"Maxyph Puzzle\n{DateTime.Now.ToString("ddd MMM d")}\nMy Score: {Score}\n{string.Join("", output)}";
         JS.InvokeVoidAsync("copyText", scoreCopy);
     }
 }

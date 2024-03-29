@@ -7,6 +7,7 @@
     --color-four: #c1246b;
     --color-five: #FF7F27;
     --color-six: #FFC90E;
+    --color-background: #99d9ea;
     /*New Colors:
     D52F64 - > 99D9EA
     FD4C55 -> 00A2E8
@@ -24,7 +25,7 @@ h1 {
 body {
     max-width: 500px;
     margin: auto;
-    background-image: linear-gradient(to bottom right, var(--color-three), var(--color-four));
+    background-color: var(--color-background);
     height: 100vh;
 }
 
@@ -94,11 +95,19 @@ main {
     margin: 5px;
     text-align: center;
     transform: rotate(45deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
     .box div {
         transform: rotate(-45deg);
     }
+
+.whiteout {
+    border-color: white;
+    background-color: white;
+}
 
 .keyboard {
     margin: 25px;
@@ -145,7 +154,17 @@ button {
 .message {
     text-align: center;
     font-size: 24px;
-    width:300px;
+    width: 300px;
     margin: auto;
-    padding-top:20px;
+    padding-top: 20px;
+}
+
+.kofi-link {
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+    font-size: 24px;
+    color: var(--color-five);
+    text-shadow: 2px 2px 0px var(--color-four);
+    text-decoration: underline
 }
