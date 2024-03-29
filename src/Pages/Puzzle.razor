@@ -199,7 +199,7 @@
         if (keyHit == Backspace)
         {
             var currentLetter = words[WordIndex].Letters[LetterIndex];
-            if (currentLetter.Value != ' ')
+            if (currentLetter.Value != ' ' && !currentLetter.Locked)
             {
                 currentLetter.Value = ' ';
             }
@@ -250,7 +250,7 @@
         {
             if (char.IsAsciiLetter(keyHit))
             {
-                if (LetterIndex <= 5)
+                if (LetterIndex <= 5 && !words[WordIndex].Letters[LetterIndex].Locked)
                 {
                     words[WordIndex].Letters[LetterIndex].Value = keyHit;
                     LetterIndex = Math.Min(LetterIndex + 1, 4);
