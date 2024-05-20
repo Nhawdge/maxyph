@@ -144,7 +144,6 @@
     {
         puzzleId = DateTime.Now.ToString("yyyy-MM-dd");
         var storedPuzzle = await JS.InvokeAsync<string>("loadFromStorage", $"puzzle-{puzzleId}");
-        //Console.WriteLine(storedPuzzle);
         PuzzleData puzzle = null;
         if (storedPuzzle != null)
         {
@@ -182,7 +181,6 @@
             WordIndex = Words.FindLastIndex(x => x.Letters.Any(x => char.IsLetter(x.Value)));
             UsedLetters = Words.Take(WordIndex).SelectMany(x => x.Letters.Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
             LockedLetters = Words.Take(WordIndex).SelectMany(x => x.Letters.Where(y => y.Locked).Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
-
         }
 
         ProcessLetter(' ');
@@ -262,7 +260,6 @@
                 UsedLetters = Words.Take(WordIndex).SelectMany(x => x.Letters.Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
                 LockedLetters = Words.Take(WordIndex).SelectMany(x => x.Letters.Where(y => y.Locked).Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
             }
-            Console.WriteLine("Saving:" + JsonSerializer.Serialize(Word.ToPuzzleData(Words)));
             JS.InvokeVoidAsync("saveToStorage", $"puzzle-{puzzleId}", JsonSerializer.Serialize(Word.ToPuzzleData(Words)));
         }
         else

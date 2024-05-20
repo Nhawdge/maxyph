@@ -55,9 +55,9 @@
             puzzleData.puzzle = new Puzzle();
             puzzleData.puzzle.date = DateTime.Now.ToString("yyyy-MM-dd");
             puzzleData.puzzle.id = Guid.NewGuid().ToString();
-            puzzleData.puzzle.data = new Datum[5];
+            puzzleData.puzzle.data = new Datum[6];
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 puzzleData.puzzle.data[i] = new Datum
                 {
