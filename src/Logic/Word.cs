@@ -48,6 +48,27 @@
         {
             return string.Join("", Letters.Select(x => x.Value));
         }
+
+        public static PuzzleData ToPuzzleData(List<Word> words)
+        {
+            var puzzleData = new PuzzleData();
+            puzzleData.puzzle = new Puzzle();
+            puzzleData.puzzle.date = DateTime.Now.ToString("yyyy-MM-dd");
+            puzzleData.puzzle.id = Guid.NewGuid().ToString();
+            puzzleData.puzzle.data = new Datum[5];
+
+            for (int i = 0; i < 5; i++)
+            {
+                puzzleData.puzzle.data[i] = new Datum
+                {
+                    letter = words[i].ToString(),
+                    lockIndex = words[i].Letters.FindIndex(x => x.Locked)
+                };
+            }
+
+            return puzzleData;
+
+        }
     }
 
     public class Letter

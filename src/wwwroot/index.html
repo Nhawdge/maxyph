@@ -18,6 +18,34 @@
     <div id="app">
         <Routes />
         <div> Loading! </div>
+        <script>
+            function toggleHowToPlay() {
+
+                var modal = document.getElementById("how-to-play")
+                if (modal.open) {
+                    modal.close();
+                }
+                else {
+                    modal.showModal();
+                }
+            }
+            function copyText(text) {
+                navigator.clipboard.writeText(text).then(function () {
+                    console.log("Copied to clipboard!");
+                })
+                .catch(function (error) {
+                    alert(error);
+                });
+            }
+
+            function saveToStorage(key, value) {
+                localStorage.setItem(key, value);
+            }
+
+            function loadFromStorage(key) {
+                return localStorage.getItem(key);
+            }
+        </script>
         <script src="_framework/blazor.webassembly.js"></script>
     </div>
 </body>

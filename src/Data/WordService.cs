@@ -1,4 +1,5 @@
 ﻿using Maxyph.Logic;
+using System.Text.Json;
 
 namespace Maxyph.Data
 {
@@ -19,5 +20,7 @@ namespace Maxyph.Data
             }
             return new Word(word);
         }
+
+       
     }
 }

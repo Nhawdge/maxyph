@@ -1,34 +1,16 @@
 ﻿@page "/"
 @page "/puzzle"
 
+@using Maxyph.Data
 @using Maxyph.Logic
+@using System.Text.Json
 @using static System.Net.WebRequestMethods
 
 @inject HttpClient Http
 @inject IJSRuntime JS
 
 <main @onkeypress="ProcessKeyPress" @ref="MainTag">
-    <script>
-        function toggleHowToPlay() {
 
-            var modal = document.getElementById("how-to-play")
-            console.log(modal);
-            if (modal.open) {
-                modal.close();
-            }
-            else {
-                modal.showModal();
-            }
-        }
-        function copyText(text) {
-            navigator.clipboard.writeText(text).then(function () {
-                console.log("Copied to clipboard!");
-            })
-                .catch(function (error) {
-                    alert(error);
-                });
-        }
-    </script>
     <h1>
         MAXYPH
     </h1>
@@ -48,7 +30,7 @@
         </ul>
     </dialog>
     <div class="puzzle">
-        @foreach (var (row, wIndex) in words.Select((x, i) => (x, i)))
+        @foreach (var (row, wIndex) in Words.Select((x, i) => (x, i)))
         {
             <div class="row">
                 <div class="word">
@@ -115,7 +97,7 @@
         }
     </div>
     <a class="kofi-link" href="https://ko-fi.com/maxyph"> Buy us a Ko-fi</a>
-@*     <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
+    @*     <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
     <script type='text/javascript'>kofiwidget2.init('Support Me on Ko-fi', '#29abe0', 'X8X4TGANN'); kofiwidget2.draw();</script> *@
 </main>
 
@@ -124,7 +106,7 @@
     private ElementReference MainTag;
     private ElementReference HowToPlay;
 
-    private List<Word> words = new();
+    private List<Word> Words = new();
     private Word PuzzleStart = new();
     private List<string> ValidWords = new();
     private List<char> UsedLetters = new();
@@ -132,6 +114,7 @@
     private int WordIndex = 0;
     private int LetterIndex = 0;
     private bool PuzzleCompleted = false;
+    private string puzzleId = "";
 
     private char Backspace = '←';
     private char Enter = '→';
@@ -159,24 +142,58 @@
 
     protected async Task<bool> LoadTodaysPuzzle()
     {
-        var puzzle = await Http.GetFromJsonAsync<PuzzleData>("https://u2qy92og0i.execute-api.us-west-2.amazonaws.com/puzzle");
-        //var puzzle = await Http.GetFromJsonAsync<PuzzleData>("Data/DailyPuzzle.json");
+        puzzleId = DateTime.Now.ToString("yyyy-MM-dd");
+        var storedPuzzle = await JS.InvokeAsync<string>("loadFromStorage", $"puzzle-{puzzleId}");
+        //Console.WriteLine(storedPuzzle);
+        PuzzleData puzzle = null;
+        if (storedPuzzle != null)
+        {
+            puzzle = JsonSerializer.Deserialize<PuzzleData>(storedPuzzle);
+        }
+        else
+        {
+            puzzle = await Http.GetFromJsonAsync<PuzzleData>("https://u2qy92og0i.execute-api.us-west-2.amazonaws.com/puzzle");
+            //puzzle = await Http.GetFromJsonAsync<PuzzleData>("Data/DailyPuzzle.json");
+        }
+
+        this.puzzleId = puzzle.puzzle.date;
+        var puzzleInProgress = false;
 
         foreach (var row in puzzle.puzzle.data)
         {
             var nextWord = new Word();
+            if (row.letter.Length > 1)
+            {
+                puzzleInProgress = true;
+                nextWord.Letters = row.letter.ToArray().Select(x => new Letter { Locked = false, Value = x }).ToList();
+            }
+            else
+            {
+                nextWord.SetLetterAtPosition(row.lockIndex, row.letter.ToLower().FirstOrDefault());
+            }
             nextWord.LockLetter(row.lockIndex);
-            nextWord.SetLetterAtPosition(row.lockIndex, row.letter.ToLower().FirstOrDefault());
-            words.Add(nextWord);
+            Words.Add(nextWord);
+            ProcessLetter(' ');
+
         }
+
+        if (puzzleInProgress)
+        {
+            WordIndex = Words.FindLastIndex(x => x.Letters.Any(x => char.IsLetter(x.Value)));
+            UsedLetters = Words.Take(WordIndex).SelectMany(x => x.Letters.Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
+            LockedLetters = Words.Take(WordIndex).SelectMany(x => x.Letters.Where(y => y.Locked).Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
+
+        }
+
         ProcessLetter(' ');
+        await JS.InvokeVoidAsync("saveToStorage", $"puzzle-{puzzleId}", JsonSerializer.Serialize(Word.ToPuzzleData(Words)));
 
         return true;
     }
 
     protected bool IsWordValid(Word word)
     {
-        var lockedWords = words.Take(WordIndex).Select(x => x.ToString());
+        var lockedWords = Words.Take(WordIndex).Select(x => x.ToString());
         StatusMessage = "";
         if (lockedWords.Contains(word.ToString()))
         {
@@ -198,7 +215,7 @@
     {
         if (keyHit == Backspace)
         {
-            var currentLetter = words[WordIndex].Letters[LetterIndex];
+            var currentLetter = Words[WordIndex].Letters[LetterIndex];
             if (currentLetter.Value != ' ' && !currentLetter.Locked)
             {
                 currentLetter.Value = ' ';
@@ -207,7 +224,7 @@
             {
                 LetterIndex = Math.Max(0, Math.Min(5, LetterIndex - 1));
             }
-            var newLetter = words[WordIndex].Letters[LetterIndex];
+            var newLetter = Words[WordIndex].Letters[LetterIndex];
             if (newLetter.Locked)
             {
                 LetterIndex = Math.Max(0, Math.Min(5, LetterIndex - 1));
@@ -215,17 +232,17 @@
         }
         else if (keyHit == Enter)
         {
-            var word = words[WordIndex];
+            var word = Words[WordIndex];
             if (IsWordValid(word))
             {
                 WordIndex++;
                 LetterIndex = 0;
                 Score = CalcScore();
 
-                var newWord = words.ElementAtOrDefault(WordIndex);
+                var newWord = Words.ElementAtOrDefault(WordIndex);
                 if (newWord != null)
                 {
-                    var lastWord = words.ElementAtOrDefault(WordIndex - 1);
+                    var lastWord = Words.ElementAtOrDefault(WordIndex - 1);
                     var lockedIndex = newWord.Letters.FindIndex(x => x.Locked);
                     var lockedParent = lastWord.Letters.ElementAtOrDefault(lockedIndex);
                     if (lockedParent != null)
@@ -242,23 +259,25 @@
                     StateHasChanged();
                     return;
                 }
-                UsedLetters = words.Take(WordIndex).SelectMany(x => x.Letters.Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
-                LockedLetters = words.Take(WordIndex).SelectMany(x => x.Letters.Where(y => y.Locked).Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
+                UsedLetters = Words.Take(WordIndex).SelectMany(x => x.Letters.Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
+                LockedLetters = Words.Take(WordIndex).SelectMany(x => x.Letters.Where(y => y.Locked).Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
             }
+            Console.WriteLine("Saving:" + JsonSerializer.Serialize(Word.ToPuzzleData(Words)));
+            JS.InvokeVoidAsync("saveToStorage", $"puzzle-{puzzleId}", JsonSerializer.Serialize(Word.ToPuzzleData(Words)));
         }
         else
         {
             if (char.IsAsciiLetter(keyHit))
             {
-                if (LetterIndex <= 5 && !words[WordIndex].Letters[LetterIndex].Locked)
+                if (LetterIndex <= 5 && !Words[WordIndex].Letters[LetterIndex].Locked)
                 {
-                    words[WordIndex].Letters[LetterIndex].Value = keyHit;
+                    Words[WordIndex].Letters[LetterIndex].Value = keyHit;
                     LetterIndex = Math.Min(LetterIndex + 1, 4);
                 }
             }
         }
 
-        var nextLetter = words[WordIndex].Letters[LetterIndex];
+        var nextLetter = Words[WordIndex].Letters[LetterIndex];
         if (nextLetter.Locked)
         {
             LetterIndex = Math.Min(LetterIndex + 1, 4);
@@ -286,7 +305,7 @@
 
     private int CalcScore()
     {
-        var letters = words.SelectMany(x => x.Letters.Select(z => z.Value).Where(z => char.IsLetter(z)));
+        var letters = Words.SelectMany(x => x.Letters.Select(z => z.Value).Where(z => char.IsLetter(z)));
         var total = new HashSet<char>(letters);
         return total.Count;
     }
@@ -306,7 +325,7 @@
 
         var seenLetters = new HashSet<char>() { '\0' };
 
-        var output = words.Select((x, i) =>
+        var output = Words.Select((x, i) =>
         {
             var wordRow = x.Letters.Select(z =>
             {
@@ -337,5 +356,11 @@
         var scoreCopy = $"Maxyph Puzzle\n{DateTime.Now.ToString("ddd MMM d")}\nMy Score: {Score}\n{string.Join("", output)}";
         JS.InvokeVoidAsync("copyText", scoreCopy);
     }
+    /*
+    * Ashley Feedback:
+    * The new colors are not great. Harder on the eyes
+    * The blacked out used letter I also don't personally like
+    * I didn't realize the x was a surrender.... hate that
+    * If you keep typing it doesn't stop you after surrender
+    */
 }
-
