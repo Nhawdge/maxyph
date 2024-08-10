@@ -129,11 +129,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var wordstxt = await Http.GetStringAsync("Data/Words.txt");
+        ValidWords = wordstxt.Split('\n').Select(x => x.Trim()).ToList();
+
         await LoadTodaysPuzzle();
 
         //await MainTag.FocusAsync();
-        var wordstxt = await Http.GetStringAsync("Data/Words.txt");
-        ValidWords = wordstxt.Split('\n').Select(x => x.Trim()).ToList();
 
         StateHasChanged();
 
@@ -181,10 +182,18 @@
             WordIndex = Words.FindLastIndex(x => x.Letters.Any(x => char.IsLetter(x.Value)));
             UsedLetters = Words.Take(WordIndex).SelectMany(x => x.Letters.Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
             LockedLetters = Words.Take(WordIndex).SelectMany(x => x.Letters.Where(y => y.Locked).Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
+            Score = CalcScore();
         }
-
-        ProcessLetter(' ');
-        await JS.InvokeVoidAsync("saveToStorage", $"puzzle-{puzzleId}", JsonSerializer.Serialize(Word.ToPuzzleData(Words)));
+        if (WordIndex >= 5 && Words[WordIndex].Letters.All(x => char.IsLetter(x.Value)))
+        {
+            ProcessLetter(Enter);
+        }
+        else
+        {
+            ProcessLetter(' ');
+            await JS.InvokeVoidAsync("saveToStorage", $"puzzle-{puzzleId}", JsonSerializer.Serialize(Word.ToPuzzleData(Words)));
+        }
+        StateHasChanged();
 
         return true;
     }
@@ -253,8 +262,8 @@
                 {
                     StatusMessage = "You have completed the puzzle! Your score is " + Score;
                     PuzzleCompleted = true;
-                    GetCopyText();
                     StateHasChanged();
+                    JS.InvokeVoidAsync("saveToStorage", $"puzzle-{puzzleId}", JsonSerializer.Serialize(Word.ToPuzzleData(Words)));
                     return;
                 }
                 UsedLetters = Words.Take(WordIndex).SelectMany(x => x.Letters.Select(z => z.Value).Where(z => char.IsLetter(z))).ToList();
