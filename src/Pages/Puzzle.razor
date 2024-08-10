@@ -203,7 +203,7 @@
         }
         else
         {
-            StatusMessage = "Not a valid word";
+            StatusMessage = $"'{word}' is not a valid word";
             return false;
         }
     }
@@ -213,7 +213,7 @@
         if (keyHit == Backspace)
         {
             var currentLetter = Words[WordIndex].Letters[LetterIndex];
-            if (currentLetter.Value != ' ' && !currentLetter.Locked)
+            if (!currentLetter.Locked)
             {
                 currentLetter.Value = ' ';
             }
@@ -282,9 +282,21 @@
         StateHasChanged();
     }
 
-    private void ProcessKeyPress(KeyboardEventArgs e)
+    private void ProcessKeyPress(string e)
     {
-        ProcessLetter(e.Key.FirstOrDefault());
+        Console.WriteLine(e);
+        if (e == "Enter")
+        {
+            ProcessLetter(Enter);
+        }
+        else if (e == "Backspace")
+        {
+            ProcessLetter(Backspace);
+        }
+        else if (e.Length == 1 && !LockedLetters.Contains(e.FirstOrDefault()))
+    {
+            ProcessLetter(e.FirstOrDefault());
+        }
     }
 
     private void ProcessKeyClick(char key)
