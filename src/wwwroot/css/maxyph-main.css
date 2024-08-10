@@ -83,9 +83,9 @@ main {
         transform: translate(-10px);
     }
 
-    .row:last-child {
-        transform: translate(15px);
-    }
+/*    .row:last-child {
+        transform: translate(10px);
+    }*/
 
 
 .box {
