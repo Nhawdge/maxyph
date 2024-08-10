@@ -33,9 +33,9 @@
                 navigator.clipboard.writeText(text).then(function () {
                     console.log("Copied to clipboard!");
                 })
-                .catch(function (error) {
-                    alert(error);
-                });
+                    .catch(function (error) {
+                        alert(error);
+                    });
             }
 
             function saveToStorage(key, value) {
@@ -47,6 +47,7 @@
             }
         </script>
         <script src="_framework/blazor.webassembly.js"></script>
+        <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
     </div>
 </body>
 </html>
