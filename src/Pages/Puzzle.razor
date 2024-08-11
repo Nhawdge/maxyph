@@ -10,7 +10,6 @@
 @inject IJSRuntime JS
 
 <main @onkeypress="ProcessKeyPress" @ref="MainTag">
-
     <h1>
         MAXYPH
     </h1>
@@ -282,20 +281,20 @@
         StateHasChanged();
     }
 
-    private void ProcessKeyPress(string e)
+    private void ProcessKeyPress(KeyboardEventArgs e)
     {
         Console.WriteLine(e);
-        if (e == "Enter")
+        if (e.Key == "Enter")
         {
             ProcessLetter(Enter);
         }
-        else if (e == "Backspace")
+        else if (e.Key == "Backspace")
         {
             ProcessLetter(Backspace);
         }
-        else if (e.Length == 1 && !LockedLetters.Contains(e.FirstOrDefault()))
-    {
-            ProcessLetter(e.FirstOrDefault());
+        else if (e.Key.Length == 1 && !LockedLetters.Contains(e.Key.FirstOrDefault()))
+        {
+            ProcessLetter(e.Key.FirstOrDefault());
         }
     }
 
