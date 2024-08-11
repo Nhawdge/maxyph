@@ -9,7 +9,7 @@
 @inject HttpClient Http
 @inject IJSRuntime JS
 
-<main @onkeypress="ProcessKeyPress" @ref="MainTag">
+<main @onkeyup="ProcessKeyPress" @ref="MainTag">
     <h1>
         MAXYPH
     </h1>
@@ -28,6 +28,8 @@
             <li>Have fun!</li>
         </ul>
     </dialog>
+
+    <div class="overlay" @onkeyup="ProcessKeyPress"></div>
     <div class="puzzle">
         @foreach (var (row, wIndex) in Words.Select((x, i) => (x, i)))
         {
@@ -215,9 +217,6 @@
             if (!currentLetter.Locked)
             {
                 currentLetter.Value = ' ';
-            }
-            else
-            {
                 LetterIndex = Math.Max(0, Math.Min(5, LetterIndex - 1));
             }
             var newLetter = Words[WordIndex].Letters[LetterIndex];
